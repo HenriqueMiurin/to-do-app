@@ -1,0 +1,305 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Corpo da página */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 30px 20px;
+}
+
+/* Container principal */
+.todo-container {
+    width: 100%;
+    max-width: 850px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Título */
+.titulo {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #1e3a8a;
+    font-size: 2rem;
+}
+
+/* Formulário */
+.formulario-tarefa {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+/* Input */
+.formulario-tarefa input {
+    flex: 2;
+    min-width: 220px;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    font-size: 1rem;
+}
+
+.formulario-tarefa input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Select */
+.formulario-tarefa select {
+    flex: 1;
+    min-width: 140px;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* Botão adicionar */
+.formulario-tarefa button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #2563eb;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.formulario-tarefa button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Barra de controle */
+.barra-controle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 14px;
+    background-color: #f8fafc;
+    border-radius: 10px;
+}
+
+/* Controle de quantidade */
+.controle-quantidade {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.controle-quantidade label {
+    font-weight: bold;
+    color: #334155;
+}
+
+.controle-quantidade select {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Contador */
+.informacoes-lista {
+    font-weight: bold;
+    color: #475569;
+}
+
+/* Lista */
+#listaTarefas {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Item da tarefa */
+.tarefa {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 8px solid transparent;
+    background-color: #f8fafc;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Informações da tarefa */
+.info-tarefa {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.texto-tarefa {
+    font-size: 1rem;
+    color: #1e293b;
+    word-break: break-word;
+}
+
+.prioridade-label {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Botões de ação */
+.acoes-tarefa {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Botão concluir */
+.btn-concluir {
+    background-color: #16a34a;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-concluir:hover {
+    background-color: #15803d;
+}
+
+/* Botão remover */
+.btn-remover {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-remover:hover {
+    background-color: #b91c1c;
+}
+
+/* Prioridades */
+.alta {
+    border-left-color: #dc2626;
+}
+
+.alta .prioridade-label {
+    color: #dc2626;
+}
+
+.media {
+    border-left-color: #f59e0b;
+}
+
+.media .prioridade-label {
+    color: #d97706;
+}
+
+.baixa {
+    border-left-color: #16a34a;
+}
+
+.baixa .prioridade-label {
+    color: #15803d;
+}
+
+/* Tarefa concluída */
+.concluida {
+    opacity: 0.65;
+}
+
+.concluida .texto-tarefa {
+    text-decoration: line-through;
+    color: #64748b;
+}
+
+/* Área da paginação */
+.paginacao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+/* Botões da paginação */
+.paginacao button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #1e40af;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.paginacao button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Estado desabilitado */
+.paginacao button:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* Texto da página atual */
+#paginaAtual {
+    font-weight: bold;
+    color: #334155;
+}
+
+/* Mensagem quando não houver tarefas */
+.mensagem-vazia {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8fafc;
+    border-radius: 10px;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .formulario-tarefa {
+        flex-direction: column;
+    }
+
+    .tarefa {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .acoes-tarefa {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .barra-controle {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

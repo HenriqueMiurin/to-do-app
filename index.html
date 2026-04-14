@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List com Paginação</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="todo-container">
+        <h1 class="titulo">Minha To-Do List</h1>
+
+        <!-- Formulário para adicionar nova tarefa -->
+        <section class="formulario-tarefa">
+            <input 
+                type="text" 
+                id="descricaoTarefa" 
+                placeholder="Digite uma tarefa..."
+                aria-label="Descrição da tarefa"
+            >
+
+            <select id="prioridadeTarefa" aria-label="Selecione a prioridade da tarefa">
+                <option value="baixa">Baixa</option>
+                <option value="media">Média</option>
+                <option value="alta">Alta</option>
+            </select>
+
+            <button id="btnAdicionar">Adicionar</button>
+        </section>
+
+        <!-- Barra de controle da paginação -->
+        <section class="barra-controle">
+            <div class="controle-quantidade">
+                <label for="itensPorPagina">Mostrar:</label>
+                <select id="itensPorPagina">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="todos">Todas</option>
+                </select>
+            </div>
+
+            <div class="informacoes-lista">
+                <span id="contadorTarefas">0 tarefas</span>
+            </div>
+        </section>
+
+        <!-- Lista das tarefas -->
+        <section class="lista-wrapper">
+            <ul id="listaTarefas"></ul>
+        </section>
+
+        <!-- Navegação entre páginas -->
+        <section class="paginacao">
+            <button id="btnAnterior">Anterior</button>
+            <span id="paginaAtual">Página 1</span>
+            <button id="btnProxima">Próxima</button>
+        </section>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
