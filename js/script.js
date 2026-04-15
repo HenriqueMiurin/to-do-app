@@ -1,6 +1,8 @@
-// Seleção dos elementos do HTML
+// Seleção dos elementos da interface
 const campoDescricao = document.getElementById("descricaoTarefa");
 const seletorPrioridade = document.getElementById("prioridadeTarefa");
+const campoData = document.getElementById("dataTarefa");
+const campoHora = document.getElementById("horaTarefa");
 const botaoAdicionar = document.getElementById("btnAdicionar");
 const listaTarefas = document.getElementById("listaTarefas");
 
@@ -9,26 +11,97 @@ const botaoAnterior = document.getElementById("btnAnterior");
 const botaoProxima = document.getElementById("btnProxima");
 const textoPaginaAtual = document.getElementById("paginaAtual");
 const contadorTarefas = document.getElementById("contadorTarefas");
+const btnSilenciarAlarme = document.getElementById("btnSilenciarAlarme");
 
-// Array principal que armazenará todas as tarefas do sistema
+// Array que armazena todas as tarefas
 const tarefas = [];
 
-// Variáveis de controle da paginação
+// Variáveis da paginação
 let paginaAtual = 1;
 let itensPorPagina = 10;
 
-// Função para atualizar o contador total de tarefas
-function atualizarContador() {
-    const total = tarefas.length;
+// Variáveis do alarme contínuo
+let contextoAudio = null;
+let intervaloAlarme = null;
+let alarmeAtivo = false;
 
-    if (total === 1) {
-        contadorTarefas.textContent = "1 tarefa";
-    } else {
-        contadorTarefas.textContent = `${total} tarefas`;
-    }
+// Função para formatar data e hora
+function formatarDataHora(data, hora) {
+    const [ano, mes, dia] = data.split("-");
+    return `${dia}/${mes}/${ano} às ${hora}`;
 }
 
-// Função para calcular a quantidade total de páginas
+// Função para criar objeto Date completo
+function criarDataHoraCompleta(data, hora) {
+    return new Date(`${data}T${hora}:00`);
+}
+
+// Toca um padrão eletrônico insistente, em ciclos
+function tocarPadraoAlarme() {
+    if (!contextoAudio) {
+        contextoAudio = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    const agora = contextoAudio.currentTime;
+
+    const frequencias = [880, 740, 880, 740];
+    let deslocamento = 0;
+
+    frequencias.forEach(function (frequencia) {
+        const oscilador = contextoAudio.createOscillator();
+        const ganho = contextoAudio.createGain();
+
+        oscilador.type = "triangle";
+        oscilador.frequency.setValueAtTime(frequencia, agora + deslocamento);
+
+        ganho.gain.setValueAtTime(0.0001, agora + deslocamento);
+        ganho.gain.exponentialRampToValueAtTime(0.18, agora + deslocamento + 0.02);
+        ganho.gain.exponentialRampToValueAtTime(0.0001, agora + deslocamento + 0.28);
+
+        oscilador.connect(ganho);
+        ganho.connect(contextoAudio.destination);
+
+        oscilador.start(agora + deslocamento);
+        oscilador.stop(agora + deslocamento + 0.30);
+
+        deslocamento += 0.32;
+    });
+}
+
+// Inicia o alarme contínuo
+function iniciarAlarmeContinuo() {
+    if (alarmeAtivo) {
+        return;
+    }
+
+    alarmeAtivo = true;
+    btnSilenciarAlarme.classList.remove("oculto");
+
+    tocarPadraoAlarme();
+
+    intervaloAlarme = setInterval(function () {
+        tocarPadraoAlarme();
+    }, 1500);
+}
+
+// Para o alarme contínuo
+function pararAlarmeContinuo() {
+    if (intervaloAlarme) {
+        clearInterval(intervaloAlarme);
+        intervaloAlarme = null;
+    }
+
+    alarmeAtivo = false;
+    btnSilenciarAlarme.classList.add("oculto");
+}
+
+// Atualiza contador
+function atualizarContador() {
+    const total = tarefas.length;
+    contadorTarefas.textContent = total === 1 ? "1 tarefa" : `${total} tarefas`;
+}
+
+// Calcula total de páginas
 function calcularTotalPaginas() {
     if (itensPorPagina === "todos") {
         return 1;
@@ -37,15 +110,49 @@ function calcularTotalPaginas() {
     return Math.ceil(tarefas.length / itensPorPagina) || 1;
 }
 
-// Função principal que renderiza as tarefas na tela
+// Verifica prazos e decide se deve disparar o alarme
+function verificarPrazos() {
+    const agora = new Date();
+    let existeAlertaAtivo = false;
+
+    tarefas.forEach(function (tarefa) {
+        const dataLimite = criarDataHoraCompleta(tarefa.data, tarefa.hora);
+
+        if (tarefa.concluida) {
+            tarefa.statusTempo = "concluida";
+            return;
+        }
+
+        if (agora > dataLimite) {
+            tarefa.statusTempo = "vencida";
+            existeAlertaAtivo = true;
+            return;
+        }
+
+        const diferencaEmMilissegundos = dataLimite - agora;
+        const diferencaEmMinutos = diferencaEmMilissegundos / 1000 / 60;
+
+        if (diferencaEmMinutos <= 1 && diferencaEmMinutos >= 0) {
+            tarefa.statusTempo = "alerta";
+            existeAlertaAtivo = true;
+        } else {
+            tarefa.statusTempo = "normal";
+        }
+    });
+
+    // Se houver qualquer tarefa em alerta ou vencida, dispara o alarme
+    if (existeAlertaAtivo) {
+        iniciarAlarmeContinuo();
+    }
+}
+
+// Renderiza as tarefas
 function renderizarTarefas() {
-    // Limpa a lista atual antes de redesenhar
     listaTarefas.innerHTML = "";
 
-    // Atualiza contador
+    verificarPrazos();
     atualizarContador();
 
-    // Se não houver tarefas, mostra mensagem
     if (tarefas.length === 0) {
         listaTarefas.innerHTML = `<li class="mensagem-vazia">Nenhuma tarefa cadastrada.</li>`;
         textoPaginaAtual.textContent = "Página 1 de 1";
@@ -56,7 +163,6 @@ function renderizarTarefas() {
 
     let tarefasDaPagina = [];
 
-    // Se o usuário escolher "todos", mostra tudo em uma única página
     if (itensPorPagina === "todos") {
         tarefasDaPagina = tarefas;
     } else {
@@ -65,9 +171,7 @@ function renderizarTarefas() {
         tarefasDaPagina = tarefas.slice(inicio, fim);
     }
 
-    // Percorre somente as tarefas da página atual
     tarefasDaPagina.forEach(function (tarefaObj) {
-        // Cria o item da lista
         const itemLista = document.createElement("li");
         itemLista.classList.add("tarefa", tarefaObj.prioridade);
 
@@ -75,38 +179,69 @@ function renderizarTarefas() {
             itemLista.classList.add("concluida");
         }
 
-        // Área das informações
+        if (tarefaObj.statusTempo === "alerta") {
+            itemLista.classList.add("em-alerta");
+        }
+
+        if (tarefaObj.statusTempo === "vencida") {
+            itemLista.classList.add("vencida");
+        }
+
         const infoTarefa = document.createElement("div");
         infoTarefa.classList.add("info-tarefa");
 
-        // Texto da tarefa
         const textoTarefa = document.createElement("span");
         textoTarefa.classList.add("texto-tarefa");
         textoTarefa.textContent = tarefaObj.descricao;
 
-        // Texto da prioridade
         const prioridadeLabel = document.createElement("span");
         prioridadeLabel.classList.add("prioridade-label");
         prioridadeLabel.textContent = `Prioridade: ${tarefaObj.prioridade.toUpperCase()}`;
 
+        const dataHoraLabel = document.createElement("span");
+        dataHoraLabel.classList.add("data-hora-label");
+        dataHoraLabel.textContent = `Prazo: ${formatarDataHora(tarefaObj.data, tarefaObj.hora)}`;
+
+        const statusAlerta = document.createElement("span");
+        statusAlerta.classList.add("status-alerta");
+
+        if (tarefaObj.concluida) {
+            statusAlerta.textContent = "Status: concluída";
+        } else if (tarefaObj.statusTempo === "alerta") {
+            statusAlerta.textContent = "Status: atenção, tarefa no horário limite";
+        } else if (tarefaObj.statusTempo === "vencida") {
+            statusAlerta.textContent = "Status: tarefa vencida";
+        } else {
+            statusAlerta.textContent = "Status: dentro do prazo";
+        }
+
         infoTarefa.appendChild(textoTarefa);
         infoTarefa.appendChild(prioridadeLabel);
+        infoTarefa.appendChild(dataHoraLabel);
+        infoTarefa.appendChild(statusAlerta);
 
-        // Área dos botões
         const acoesTarefa = document.createElement("div");
         acoesTarefa.classList.add("acoes-tarefa");
 
-        // Botão concluir
         const botaoConcluir = document.createElement("button");
         botaoConcluir.classList.add("btn-concluir");
         botaoConcluir.textContent = tarefaObj.concluida ? "Reabrir" : "Concluir";
 
         botaoConcluir.addEventListener("click", function () {
             tarefaObj.concluida = !tarefaObj.concluida;
+
+            // Se todas as tarefas em alerta forem concluídas, some com o sino e para o alarme
+            const aindaExisteAlerta = tarefas.some(function (tarefa) {
+                return !tarefa.concluida && (tarefa.statusTempo === "alerta" || tarefa.statusTempo === "vencida");
+            });
+
+            if (!aindaExisteAlerta) {
+                pararAlarmeContinuo();
+            }
+
             renderizarTarefas();
         });
 
-        // Botão remover
         const botaoRemover = document.createElement("button");
         botaoRemover.classList.add("btn-remover");
         botaoRemover.textContent = "Remover";
@@ -118,10 +253,18 @@ function renderizarTarefas() {
                 tarefas.splice(indiceReal, 1);
             }
 
-            // Ajusta a página atual caso fique maior que o total após remover
             const totalPaginas = calcularTotalPaginas();
+
             if (paginaAtual > totalPaginas) {
                 paginaAtual = totalPaginas;
+            }
+
+            const aindaExisteAlerta = tarefas.some(function (tarefa) {
+                return !tarefa.concluida && (tarefa.statusTempo === "alerta" || tarefa.statusTempo === "vencida");
+            });
+
+            if (!aindaExisteAlerta) {
+                pararAlarmeContinuo();
             }
 
             renderizarTarefas();
@@ -136,58 +279,65 @@ function renderizarTarefas() {
         listaTarefas.appendChild(itemLista);
     });
 
-    // Atualiza a área da paginação
     const totalPaginas = calcularTotalPaginas();
     textoPaginaAtual.textContent = `Página ${paginaAtual} de ${totalPaginas}`;
 
-    // Controle de habilitação/desabilitação dos botões
     botaoAnterior.disabled = paginaAtual === 1 || itensPorPagina === "todos";
     botaoProxima.disabled = paginaAtual === totalPaginas || itensPorPagina === "todos";
 }
 
-// Função para adicionar nova tarefa
+// Adiciona nova tarefa
 function adicionarTarefa() {
     const descricao = campoDescricao.value.trim();
     const prioridade = seletorPrioridade.value;
+    const data = campoData.value;
+    const hora = campoHora.value;
 
-    // Impede cadastro vazio
     if (descricao === "") {
-        alert("Por favor, digite uma tarefa.");
+        alert("Por favor, digite a descrição da tarefa.");
         return;
     }
 
-    // Cria o objeto da tarefa
+    if (data === "") {
+        alert("Por favor, selecione a data da tarefa.");
+        return;
+    }
+
+    if (hora === "") {
+        alert("Por favor, selecione a hora da tarefa.");
+        return;
+    }
+
     const novaTarefa = {
         descricao: descricao,
         prioridade: prioridade,
-        concluida: false
+        data: data,
+        hora: hora,
+        concluida: false,
+        statusTempo: "normal"
     };
 
-    // Adiciona no array principal
     tarefas.unshift(novaTarefa);
 
-    // Volta para a primeira página para mostrar a tarefa mais recente
     paginaAtual = 1;
 
-    // Limpa o campo
     campoDescricao.value = "";
+    campoData.value = "";
+    campoHora.value = "";
     campoDescricao.focus();
 
-    // Atualiza a tela
     renderizarTarefas();
 }
 
-// Evento do botão adicionar
+// Eventos
 botaoAdicionar.addEventListener("click", adicionarTarefa);
 
-// Permite adicionar pressionando Enter
 campoDescricao.addEventListener("keypress", function (evento) {
     if (evento.key === "Enter") {
         adicionarTarefa();
     }
 });
 
-// Evento para mudar a quantidade de itens por página
 seletorItensPorPagina.addEventListener("change", function () {
     const valorSelecionado = seletorItensPorPagina.value;
 
@@ -197,12 +347,10 @@ seletorItensPorPagina.addEventListener("change", function () {
         itensPorPagina = Number(valorSelecionado);
     }
 
-    // Sempre volta para a primeira página ao mudar o seletor
     paginaAtual = 1;
     renderizarTarefas();
 });
 
-// Evento para ir para a página anterior
 botaoAnterior.addEventListener("click", function () {
     if (paginaAtual > 1) {
         paginaAtual--;
@@ -210,7 +358,6 @@ botaoAnterior.addEventListener("click", function () {
     }
 });
 
-// Evento para ir para a próxima página
 botaoProxima.addEventListener("click", function () {
     const totalPaginas = calcularTotalPaginas();
 
@@ -219,6 +366,16 @@ botaoProxima.addEventListener("click", function () {
         renderizarTarefas();
     }
 });
+
+// Botão do sino para silenciar o alarme
+btnSilenciarAlarme.addEventListener("click", function () {
+    pararAlarmeContinuo();
+});
+
+// Verifica os prazos automaticamente
+setInterval(function () {
+    renderizarTarefas();
+}, 30000);
 
 // Renderização inicial
 renderizarTarefas();

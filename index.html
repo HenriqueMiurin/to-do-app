@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List com Paginação</title>
+    <title>To-Do List com Alertas</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <main class="todo-container">
         <h1 class="titulo">Minha To-Do List</h1>
 
-        <!-- Formulário para adicionar nova tarefa -->
+        <!-- Botão de sino: fica escondido até existir alerta -->
+        <button id="btnSilenciarAlarme" class="btn-sino oculto" aria-label="Silenciar alarme">
+            🔔 Silenciar Alarme
+        </button>
+
+        <!-- Formulário principal -->
         <section class="formulario-tarefa">
             <input 
                 type="text" 
@@ -25,10 +30,22 @@
                 <option value="alta">Alta</option>
             </select>
 
+            <input 
+                type="date" 
+                id="dataTarefa" 
+                aria-label="Selecione a data da tarefa"
+            >
+
+            <input 
+                type="time" 
+                id="horaTarefa" 
+                aria-label="Selecione a hora da tarefa"
+            >
+
             <button id="btnAdicionar">Adicionar</button>
         </section>
 
-        <!-- Barra de controle da paginação -->
+        <!-- Barra de controle -->
         <section class="barra-controle">
             <div class="controle-quantidade">
                 <label for="itensPorPagina">Mostrar:</label>
@@ -45,12 +62,12 @@
             </div>
         </section>
 
-        <!-- Lista das tarefas -->
+        <!-- Lista -->
         <section class="lista-wrapper">
             <ul id="listaTarefas"></ul>
         </section>
 
-        <!-- Navegação entre páginas -->
+        <!-- Paginação -->
         <section class="paginacao">
             <button id="btnAnterior">Anterior</button>
             <span id="paginaAtual">Página 1</span>

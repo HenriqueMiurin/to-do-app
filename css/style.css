@@ -19,19 +19,56 @@ body {
 /* Container principal */
 .todo-container {
     width: 100%;
-    max-width: 850px;
+    max-width: 950px;
     background-color: #ffffff;
     border-radius: 16px;
     padding: 30px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    position: relative;
 }
 
 /* Título */
 .titulo {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     color: #1e3a8a;
     font-size: 2rem;
+}
+
+/* Botão do sino */
+.btn-sino {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 999px;
+    background-color: #dc2626;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    animation: pulsarSino 1s infinite;
+}
+
+.btn-sino:hover {
+    background-color: #b91c1c;
+}
+
+.oculto {
+    display: none;
+}
+
+@keyframes pulsarSino {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.04);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Formulário */
@@ -42,32 +79,36 @@ body {
     margin-bottom: 20px;
 }
 
-/* Input */
-.formulario-tarefa input {
-    flex: 2;
-    min-width: 220px;
+/* Inputs e selects */
+.formulario-tarefa input,
+.formulario-tarefa select {
     padding: 12px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     outline: none;
     font-size: 1rem;
+    background-color: #fff;
 }
 
-.formulario-tarefa input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+/* Campo descrição */
+#descricaoTarefa {
+    flex: 2;
+    min-width: 220px;
 }
 
-/* Select */
-.formulario-tarefa select {
+/* Campo data, hora e prioridade */
+#dataTarefa,
+#horaTarefa,
+#prioridadeTarefa {
     flex: 1;
     min-width: 140px;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 1rem;
-    background-color: #fff;
-    cursor: pointer;
+}
+
+/* Foco */
+.formulario-tarefa input:focus,
+.formulario-tarefa select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 /* Botão adicionar */
@@ -99,7 +140,7 @@ body {
     border-radius: 10px;
 }
 
-/* Controle de quantidade */
+/* Quantidade por página */
 .controle-quantidade {
     display: flex;
     align-items: center;
@@ -138,18 +179,20 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 15px;
-    padding: 15px;
+    padding: 16px;
     border-radius: 10px;
     border-left: 8px solid transparent;
     background-color: #f8fafc;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: 0.3s;
 }
 
-/* Informações da tarefa */
+/* Info da tarefa */
 .info-tarefa {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex: 1;
 }
 
 .texto-tarefa {
@@ -158,16 +201,19 @@ body {
     word-break: break-word;
 }
 
-.prioridade-label {
+.prioridade-label,
+.data-hora-label,
+.status-alerta {
     font-size: 0.9rem;
     font-weight: bold;
 }
 
-/* Botões de ação */
+/* Ações */
 .acoes-tarefa {
     display: flex;
     gap: 10px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 /* Botão concluir */
@@ -200,7 +246,7 @@ body {
     background-color: #b91c1c;
 }
 
-/* Prioridades */
+/* Prioridade alta */
 .alta {
     border-left-color: #dc2626;
 }
@@ -209,6 +255,7 @@ body {
     color: #dc2626;
 }
 
+/* Prioridade média */
 .media {
     border-left-color: #f59e0b;
 }
@@ -217,6 +264,7 @@ body {
     color: #d97706;
 }
 
+/* Prioridade baixa */
 .baixa {
     border-left-color: #16a34a;
 }
@@ -235,7 +283,42 @@ body {
     color: #64748b;
 }
 
-/* Área da paginação */
+/* Tarefa em alerta */
+.em-alerta {
+    border: 2px solid #f59e0b;
+    background-color: #fff7ed;
+    animation: pulsar 1s infinite;
+}
+
+.em-alerta .status-alerta {
+    color: #d97706;
+}
+
+/* Tarefa vencida */
+.vencida {
+    border: 2px solid #dc2626;
+    background-color: #fef2f2;
+    animation: pulsar 1s infinite;
+}
+
+.vencida .status-alerta {
+    color: #dc2626;
+}
+
+/* Animação de alerta */
+@keyframes pulsar {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.01);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Paginação */
 .paginacao {
     display: flex;
     justify-content: center;
@@ -245,7 +328,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* Botões da paginação */
 .paginacao button {
     padding: 10px 16px;
     border: none;
@@ -260,19 +342,17 @@ body {
     background-color: #1d4ed8;
 }
 
-/* Estado desabilitado */
 .paginacao button:disabled {
     background-color: #94a3b8;
     cursor: not-allowed;
 }
 
-/* Texto da página atual */
 #paginaAtual {
     font-weight: bold;
     color: #334155;
 }
 
-/* Mensagem quando não houver tarefas */
+/* Mensagem vazia */
 .mensagem-vazia {
     text-align: center;
     padding: 20px;
@@ -282,8 +362,8 @@ body {
     font-style: italic;
 }
 
-/* Responsividade */
-@media (max-width: 600px) {
+/* Responsivo */
+@media (max-width: 700px) {
     .formulario-tarefa {
         flex-direction: column;
     }
